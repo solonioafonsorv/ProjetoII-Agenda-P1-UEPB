@@ -698,7 +698,7 @@ int main(){
         if(entrada == 2){
             
             if(contato == NULL) {
-                printf("Nao ha contatos na EstruturaDeContato!");
+                printf("Nao ha contatos na Agenda!");
             } else {
                 imprimirTodosOsContatos(contato);
             }
