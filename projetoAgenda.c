@@ -1,25 +1,91 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
+#include <conio.h>
 
+//Cores:
+void black() {
+    printf("\033[0;30m");
+}
+void red() {
+    printf("\033[0;31m");
+}
+void yellow() {
+    printf("\033[0;33m");
+}
+void blue() {
+    printf("\033[0;34m");
+}
+void green() {
+    printf("\033[0;32m");
+}
+void white() {
+    printf("\033[0;37m");
+}
+void cyan() {
+    printf("\033[0;36m");
+}
+void purple() {
+    printf("Purple \033[0;35m");
+}
+//NEGRITO
+void blackBold() {
+    printf("\033[1;30m");
+}
+void redBold() {
+    printf("\033[1;31m");
+}
+void yellowBold() {
+    printf("\033[1;33m");
+}
+void blueBold() {
+    printf("\033[1;34m");
+}
+void greenBold() {
+    printf("\033[1;32m");
+}
+void whiteBold() {
+    printf("\033[1;37m");
+}
+void cyanBold() {
+    printf("\033[1;36m");
+}
+void purpleBold() {
+    printf("Purple \033[1;35m");
+}
+void reset() {
+    printf("\033[0m");
+}
+
+// Structs
 typedef struct{
     char nomeEstrutura[40];
     char telefoneEstrutura[15];
     char celularEstrutura[15];
     char emailEstrutura[40];
-    struct Agenda *proximoContato;
-}Agenda;
+    struct EstruturaDeContato *proximoContato;
+}EstruturaDeContato;
 
-void vetorRecebeVetorChar(char vetor1[100], char vetor2[100], int tamanho){
+typedef struct{
+    int diaEstrutura;
+    int mesEstrutura;
+    int anoEstrutura;
+    char lembreteEstrutura[2048];
+    struct EstruturaDeLembrete *proximoLembrete;
+}EstruturaDeLembrete;
+
+// Funções
+void vetorRecebeVetorChar(char vetor1[2048], char vetor2[2048], int tamanho){
     int i;
     for(i=0;i<tamanho;i++){
         vetor1[i] = vetor2[i];
     }
 }
 
-Agenda * inserirContatoPelaFrente(Agenda *primeiroContato, char nome[40], char telefone[15], char email[40], char celular[15]){
+EstruturaDeContato * inserirContatoPelaFrente(EstruturaDeContato *primeiroContato, char nome[40], char telefone[15], char email[40], char celular[15]){
 
-    Agenda *novoContato = (Agenda*) malloc(sizeof(Agenda));
+    EstruturaDeContato *novoContato = (EstruturaDeContato*) malloc(sizeof(EstruturaDeContato));
     vetorRecebeVetorChar(novoContato->nomeEstrutura, nome, 40);
     vetorRecebeVetorChar(novoContato->telefoneEstrutura, telefone, 15);
     vetorRecebeVetorChar(novoContato->celularEstrutura, celular, 15);
@@ -29,19 +95,43 @@ Agenda * inserirContatoPelaFrente(Agenda *primeiroContato, char nome[40], char t
     if(primeiroContato == NULL){
         return novoContato;
     } else {
-        Agenda *ultimoContatoDaAgenda = primeiroContato;
+        EstruturaDeContato *ultimoContatoDaEstruturaDeContato = primeiroContato;
 
-        while(ultimoContatoDaAgenda->proximoContato != NULL){
-            ultimoContatoDaAgenda = ultimoContatoDaAgenda->proximoContato;
+        while(ultimoContatoDaEstruturaDeContato->proximoContato != NULL){
+            ultimoContatoDaEstruturaDeContato = ultimoContatoDaEstruturaDeContato->proximoContato;
         }
 
-        ultimoContatoDaAgenda->proximoContato = novoContato;
+        ultimoContatoDaEstruturaDeContato->proximoContato = novoContato;
 
         return primeiroContato;
     }
 }
 
-void imprimeAgendaCompleta(Agenda *contato){
+EstruturaDeLembrete * inserirLembretePelaFrente(EstruturaDeContato *primeiroLembrete, int dia, int mes, int ano, char lembrete[2048]){
+
+    EstruturaDeLembrete *novoLembrete = (EstruturaDeLembrete*) malloc(sizeof(EstruturaDeLembrete));
+    novoLembrete->diaEstrutura = dia;
+    novoLembrete->mesEstrutura = mes;
+    novoLembrete->anoEstrutura = ano;
+    vetorRecebeVetorChar(novoLembrete->lembreteEstrutura, lembrete, 2048);
+    novoLembrete->proximoLembrete = NULL;
+
+    if(primeiroLembrete == NULL){
+        return novoLembrete;
+    } else {
+        EstruturaDeLembrete *ultimoLembreteDaLista = primeiroLembrete;
+
+        while(ultimoLembreteDaLista->proximoLembrete != NULL){
+            ultimoLembreteDaLista = ultimoLembreteDaLista->proximoLembrete;
+        }
+
+        ultimoLembreteDaLista->proximoLembrete = novoLembrete;
+
+        return primeiroLembrete;
+    }
+}
+
+void imprimirTodosOsContatos(EstruturaDeContato *contato){
     int i = 1;
 
     while (contato != NULL){
@@ -56,7 +146,17 @@ void imprimeAgendaCompleta(Agenda *contato){
     }
 }
 
-void imprimeContatoDaAgenda(Agenda *contato, int posicao){
+void imprimirTodosOsLembretes(EstruturaDeLembrete *primeiroLembrete){
+
+    while (primeiroLembrete != NULL){
+        printf("\nDia %d/%d/%d:\n", primeiroLembrete->diaEstrutura, primeiroLembrete->mesEstrutura, primeiroLembrete->anoEstrutura);
+        printf("\n%s\n", primeiroLembrete->lembreteEstrutura);
+        
+        primeiroLembrete = primeiroLembrete->proximoLembrete;
+    }
+}
+
+void imprimeContatoDaAgenda(EstruturaDeContato *contato, int posicao){
     int i;
 
     if(posicao > 0){
@@ -70,9 +170,22 @@ void imprimeContatoDaAgenda(Agenda *contato, int posicao){
     }
 }
 
-int buscaContatoDaAgenda(Agenda *contato, char nome[40]){
+void imprimeLembreteDaAgenda(EstruturaDeLembrete *lembrete, int posicao){
+    int i;
+
+    if(posicao > 0){
+        for(i=1;i<posicao;i++){
+            lembrete = lembrete->proximoLembrete;
+        }
+        printf("\nDia %d/%d/%d:\n", lembrete->diaEstrutura, lembrete->mesEstrutura, lembrete->anoEstrutura);
+        printf("\n%s\n", lembrete->lembreteEstrutura);
+    }
+}
+
+
+int buscarContatoDaAgenda(EstruturaDeContato *contato, char nome[40]){
     int i = 1;
-    Agenda *ponteiroDeBusca = contato;
+    EstruturaDeContato *ponteiroDeBusca = contato;
 
     if(contato == NULL){ // Essa condicional serve para resolver um erro que ocorre quando busca algo em uma lista encadeada nula.
         printf("\nNao foi possivel encontrar '%s'\n", nome);
@@ -93,11 +206,44 @@ int buscaContatoDaAgenda(Agenda *contato, char nome[40]){
     return i;
 }
 
-Agenda * transferirDeArquivoParaAgenda(Agenda *contatos){
-    FILE *arquivoComContatos = fopen("contatos.txt", "rb");
-    Agenda *ponteiroDoArquivo;
+int buscarLembreteDaAgenda(EstruturaDeLembrete *lembrete, int dia, int mes, int ano, int *vetorDosLembretes){ // esse vetor existe por temos varios lembretes de uma data só.
+    int posicao = 1;
+    int j = 0;
+    int numeroDeLembretesAchados = 0;
+    EstruturaDeLembrete *ponteiroDeBusca = lembrete;
 
-    while(fread(ponteiroDoArquivo, sizeof(Agenda), 1, arquivoComContatos)==1){
+    if(lembrete == NULL){ // Essa condicional serve para resolver um erro que ocorre quando busca algo em uma lista encadeada nula.
+        printf("\nNao existem lembretes para o dia %d/%d/%d\n", dia, mes, ano);
+        return 0;
+    }
+
+    while(ponteiroDeBusca != NULL){
+        while( !(ponteiroDeBusca->diaEstrutura == dia && ponteiroDeBusca->mesEstrutura == mes && ponteiroDeBusca->anoEstrutura == ano) && ponteiroDeBusca != NULL){
+
+            ponteiroDeBusca = ponteiroDeBusca->proximoLembrete;
+            posicao++;
+
+            if(ponteiroDeBusca == NULL){
+            printf("\nNao existem lembretes para o dia %d/%d/%d\n", dia, mes, ano);
+            return 0;
+            }
+        }
+        vetorDosLembretes[j] = posicao;
+        j++;
+        posicao++;
+        ponteiroDeBusca = ponteiroDeBusca->proximoLembrete;
+        numeroDeLembretesAchados++;
+
+    }
+    
+    return numeroDeLembretesAchados;
+}
+
+EstruturaDeContato * transferirContatosDoArquivoParaOPrograma(EstruturaDeContato *contatos){
+    FILE *arquivoComContatos = fopen("contatos.txt", "rb");
+    EstruturaDeContato *ponteiroDoArquivo;
+
+    while(fread(ponteiroDoArquivo, sizeof(EstruturaDeContato), 1, arquivoComContatos)==1){
         contatos = inserirContatoPelaFrente(contatos, ponteiroDoArquivo->nomeEstrutura, ponteiroDoArquivo->telefoneEstrutura, ponteiroDoArquivo->emailEstrutura, ponteiroDoArquivo->celularEstrutura);
     }
 
@@ -106,20 +252,44 @@ Agenda * transferirDeArquivoParaAgenda(Agenda *contatos){
     return contatos;
 }
 
-void transferirAgendaParaArquivo(Agenda *contatos){
+EstruturaDeLembrete * transferirLembretesDoArquivoParaOPrograma(EstruturaDeLembrete *lembretes){
+    FILE *arquivoComLembretes = fopen("lembretes.txt", "rb");
+    EstruturaDeLembrete *ponteiroDoArquivo;
+
+    while(fread(ponteiroDoArquivo, sizeof(EstruturaDeLembrete), 1, arquivoComLembretes)==1){
+        lembretes = inserirLembretePelaFrente(lembretes, ponteiroDoArquivo->diaEstrutura, ponteiroDoArquivo->mesEstrutura, ponteiroDoArquivo->anoEstrutura, ponteiroDoArquivo->lembreteEstrutura);
+    }
+
+    fclose(arquivoComLembretes);
+
+    return lembretes;
+}
+
+void transferirContatosParaArquivo(EstruturaDeContato *contatos){
     FILE *arquivo = fopen("contatos.txt", "wb");
 
     while(contatos != NULL){
-        fwrite(contatos, sizeof(Agenda), 1, arquivo);
+        fwrite(contatos, sizeof(EstruturaDeContato), 1, arquivo);
         contatos = contatos->proximoContato;
     }
 
     fclose(arquivo);
 }
 
-Agenda * Excluir_contato(Agenda *contatos, int posicao){
-    Agenda *contatoParaExcluir = contatos;
-    Agenda *auxiliarDeReligagemDosContatos = NULL;
+void transferirLembretesParaArquivo(EstruturaDeLembrete *lembretes){
+    FILE *arquivo2 = fopen("lembretes.txt", "wb");
+
+    while(lembretes != NULL){
+        fwrite(lembretes, sizeof(EstruturaDeLembrete), 1, arquivo2);
+        lembretes = lembretes->proximoLembrete;
+    }
+
+    fclose(arquivo2);
+}
+
+EstruturaDeContato * excluirContato(EstruturaDeContato *contatos, int posicao){
+    EstruturaDeContato *contatoParaExcluir = contatos;
+    EstruturaDeContato *auxiliarDeReligagemDosContatos = NULL;
     int i;
 
     if(posicao != 0){
@@ -143,20 +313,337 @@ Agenda * Excluir_contato(Agenda *contatos, int posicao){
     }
 }
 
-void excluirTodosOsContatos(Agenda *contatos){
-    Agenda *contatoParaExcluir = contatos;
-    Agenda *auxiliarExclusao;
+void excluirTodosOsContatos(EstruturaDeContato *contatos){
+    EstruturaDeContato *contatoParaExcluir = contatos;
+    EstruturaDeContato *auxiliarExclusao;
 
     while(contatoParaExcluir != NULL){
-        auxiliarExclusao = (Agenda *) contatoParaExcluir->proximoContato;
+        auxiliarExclusao = (EstruturaDeContato *) contatoParaExcluir->proximoContato;
         free(contatoParaExcluir);
         contatoParaExcluir = auxiliarExclusao;
     }
 }
 
+/*INICIO DAS FUNÇÕES DE CALENDARIO
+Função que retorna o índice do
+dia para a data DD/MM/YYYY
+ss*/
+int numeroDoDia(int dia, int mes, int ano)
+{
+  
+    static int t[] = { 0, 3, 2, 5, 0, 3,
+                       5, 1, 4, 6, 2, 4 };
+    ano -= mes < 3;
+    return (ano + ano / 4
+            - ano / 100
+            + ano / 400
+            + t[mes - 1] + dia)
+           % 7;
+}
+  
+/* Function that returns the name of the
+mes for the given mes Number
+January - 0, February - 1 and so on*/
+char * imprimeNomeMes(int numeroDoMes)
+{
+    char* mes;
+  
+    switch (numeroDoMes) {
+    case 0:
+        mes = "Janeiro";
+        break;
+    case 1:
+        mes = "Fevereiro";
+        break;
+    case 2:
+        mes = "Marco";
+        break;
+    case 3:
+        mes = "Abril";
+        break;
+    case 4:
+        mes = "Maio";
+        break;
+    case 5:
+        mes = "Junho";
+        break;
+    case 6:
+        mes = "Julho";
+        break;
+    case 7:
+        mes = "Agosto";
+        break;
+    case 8:
+        mes = "Setembro";
+        break;
+    case 9:
+        mes = "Outubro";
+        break;
+    case 10:
+        mes = "Novembro";
+        break;
+    case 11:
+        mes = "Dezembro";
+        break;
+    }
+    return mes;
+}
+  
+// Function to return the number of dias
+// in a mes
+int numeroDeDias(int numeroDoMes, int ano)
+{
+    // Janeiro
+    if (numeroDoMes == 0)
+        return (31);
+  
+    // Fevereiro
+    if (numeroDoMes == 1) {
+        // If the ano is leap then Feb
+        // has 29 dias
+        if (ano % 400 == 0
+            || (ano % 4 == 0
+                && ano % 100 != 0))
+            return (29);
+        else
+            return (28);
+    }
+  
+    // Março
+    if (numeroDoMes == 2)
+        return (31);
+  
+    // Abril
+    if (numeroDoMes == 3)
+        return (30);
+  
+    // Maio
+    if (numeroDoMes == 4)
+        return (31);
+  
+    // Junho
+    if (numeroDoMes == 5)
+        return (30);
+  
+    // Julho
+    if (numeroDoMes == 6)
+        return (31);
+  
+    // Agosto
+    if (numeroDoMes == 7)
+        return (31);
+  
+    // Setembro
+    if (numeroDoMes == 8)
+        return (30);
+  
+    // Outubro
+    if (numeroDoMes == 9)
+        return (31);
+  
+    // Novembro
+    if (numeroDoMes == 10)
+        return (30);
+  
+    // Dezembro
+    if (numeroDoMes == 11)
+        return (31);
+}
+  
+// Function to print the calendar of
+// the given ano
+void exibirCalendario(int ano, int mes)
+{
+    int dias;
+  
+    // Index of the dia from 0 to 6
+    int atual = numeroDoDia(1, mes, ano);
+  
+    // i for Iterate through months
+    // j for Iterate through dias
+    // of the mes - i
+    for (int i = mes-1; i < mes; i++) {
+        dias = numeroDeDias(i, ano);
+  
+        // Print the atual mes name
+        blue();
+        printf("\n ---------- %s - %d -----------\n",
+               imprimeNomeMes(i),ano);
+  
+        // Print the columns
+        red();
+        printf(" Dom");
+        cyan();
+        printf("   Seg  Ter  Qua  Qui  Sex  ");
+        red();
+        printf("Sab\n");
+        reset();
+  
+        // Print appropriate spaces
+        int k;
+        for (k = 0; k < atual; k++)
+            printf("     ");
+  
+        for (int j = 1; j <= dias; j++) {
+            printf("%5d", j);
+  
+            if (++k > 6) {
+                k = 0;
+                printf("\n");
+            }
+        }
+  
+        if (k)
+            printf("\n");
+  
+        atual = k;
+    }
+  
+    return;
+}
+//FINAL DO CALENDARIO
+
+int calendario()
+{
+    SYSTEMTIME t;
+    GetLocalTime(&t);
+
+    int mes = t.wMonth;
+    int ano = t.wYear;
+    // Function Call
+    exibirCalendario(ano, mes);
+    return 0;
+}
+
+int imprimirData() {
+    SYSTEMTIME data;
+    GetLocalTime(&data);
+    int dia = data.wDay;
+    int mes = data.wMonth;
+    int ano = data.wYear;
+
+    int minuto = data.wMinute;
+    int hora = data.wHour;
+
+    if(minuto < 10) {
+        blue();
+        printf(" Hora: ");
+        cyan();
+        printf("%d:0%d \n",hora,minuto);
+        reset();
+    } else {
+        blue();
+        printf(" Hora: ");
+        cyan();
+        printf("%d:%d \n",hora,minuto);
+        reset();
+    }
+    if(mes < 10) {
+        blue();
+        printf(" Data: ");
+        cyan();
+        printf("%d/0%d/%d",dia,mes,ano);
+        reset();
+    } else {
+        blue();
+        printf(" Data: ");
+        cyan();
+        printf("%d/%d/%d",dia,mes,ano);
+        reset();
+    }
+    return 0;
+}
+
+EstruturaDeLembrete * abrirAgendaDeLembretes(EstruturaDeLembrete *primeiroLembrete) {
+    
+    int dia, mes, ano;
+    char lembrete[2048];
+    int entradaDeSelecao = 0;
+
+    while(entradaDeSelecao != 4){
+    
+        transferirLembretesParaArquivo(primeiroLembrete);
+
+        blue();
+        printf("\n -----------------------------------");
+        reset();
+        printf("\n");
+        printf(" Tens x notificacoes,\n X para 18 de marco e X para amanha.\n");
+        blue();
+        printf(" -----------------------------------\n");
+        reset();
+        printf(" 1 - | Criar novo lembrete |\n 2 - | Ver lembrete        |\n");
+        printf(" 3 - | Remover lembrete    |\n 4 - | Sair                | \n");
+
+        scanf("%d",&entradaDeSelecao);
+
+        if(entradaDeSelecao == 1) {
+
+            printf("Informe o dia do lembrete (dd/mm/aaaa): ");
+            scanf("%d/%d/%d", &dia, &mes, &ano);
+            setbuf(stdin, NULL); // isso sempre tem que ser usado antes de um gets para n dar problema.
+
+            printf("\nLembrete: \n");
+            fgets(&lembrete, 2048, stdin);
+
+            primeiroLembrete = inserirLembretePelaFrente(primeiroLembrete, dia, mes, ano, lembrete);
+        }
+        else if(entradaDeSelecao == 2) {
+            
+            setbuf(stdin, NULL);
+            char entradaChar;
+            printf("Deseja ver todos os lembretes? (s/n) ");
+            scanf("%c", &entradaChar);
+
+            if(entradaChar == 's'){
+                imprimirTodosOsLembretes(primeiroLembrete);
+            }
+            else{
+                int vetorDasPosicoesDosLembretes[300]; // esse vetor tem varias posiçoes, que são as posições dos lembretes que queremos imprimir.
+                int i;
+                int diaChave, mesChave, anoChave;
+                
+                for(i=0;i<300;i++){
+                    vetorDasPosicoesDosLembretes[i] = 0;
+                }
+
+                setbuf(stdin, NULL);
+                printf("Informe o dia do lembrete para a busca (dd/mm/aaaa): ");
+                scanf("%d/%d/%d", &diaChave, &mesChave, &anoChave);
+
+                for(i=0;i<buscarLembreteDaAgenda(primeiroLembrete, diaChave, mesChave, anoChave, vetorDasPosicoesDosLembretes);i++){
+                    imprimeLembreteDaAgenda(primeiroLembrete, vetorDasPosicoesDosLembretes[i]);
+                }
+
+                for(i=0;i<3;i++){
+                    printf("%d", vetorDasPosicoesDosLembretes[i]);
+                    printf("\n");
+                }
+            }
+        }
+        else if(entradaDeSelecao == 3) {
+
+        }
+    }
+
+    return primeiroLembrete;
+}
+
+void abrirMenu() {
+    blue();
+    printf(" -------- MENU --------\n");
+    reset();
+    printf(" 1 - | Inserir Contato \n 2 - | Listar Contatos \n 3 - | Buscar Contato");
+    printf("\n 4 - | Excluir Contato \n 5 - | Limpar os contatos \n 6 - | Abrir calendario e lembretes \n 7 - | Sair\n");
+    blue();
+    printf(" ----------------------\n");
+    reset();
+}
+
 int main(){
-    FILE *salvaContatosEmArquivo;
-    Agenda *contato = NULL;
+    FILE *salvaContatosEmArquivo, *salvaLembretesEmArquivo;
+    EstruturaDeContato *contato = NULL;
+    EstruturaDeLembrete *lembretes = NULL;
 
     int entrada;
     char nomeContato[40];
@@ -165,17 +652,25 @@ int main(){
     char celularContato[15];
     char chaveDeBusca[40];
 
-    contato = transferirDeArquivoParaAgenda(contato);
+    contato = transferirContatosDoArquivoParaOPrograma(contato);
+    salvaLembretesEmArquivo = transferirLembretesDoArquivoParaOPrograma(lembretes);
 
     salvaContatosEmArquivo = fopen("contatos.txt", "ab");
+    salvaLembretesEmArquivo = fopen("lembretes.txt","ab");
 
-    printf("\n-Agendinha-\n");
+    while(entrada != 7){
+        transferirContatosParaArquivo(contato);
+        blue();
+        printf("\n ----------- Agenda em C -----------\n");
+        reset();
 
-    while(entrada != 6){
-        transferirAgendaParaArquivo(contato);
-
-        printf("\n- - - -MENU- - - -\n1 - Inserir Contato \n2 - Listar Contatos \n3 - Buscar Contato");
-        printf("\n4 - Excluir Contato \n5 - Limpar a agenda \n6 - Sair\n-");
+        imprimirData();
+        blue();
+        printf("\n -----------------------------------\n");
+        reset();
+        
+        printf("\n");
+        abrirMenu();
         scanf("%d", &entrada);
         setbuf(stdin, NULL);
 
@@ -198,25 +693,25 @@ int main(){
         if(entrada == 2){
             
             if(contato == NULL) {
-                printf("Nao ha contatos na agenda!");
+                printf("Nao ha contatos na EstruturaDeContato!");
             } else {
-                imprimeAgendaCompleta(contato);
+                imprimirTodosOsContatos(contato);
             }
         }
 
         if(entrada == 3){
 
-            printf("\nInssira o nome do contato para a busca:\n");
+            printf("\nInsira o nome do contato para a busca:\n");
             gets(&chaveDeBusca);
 
-            imprimeContatoDaAgenda(contato, buscaContatoDaAgenda(contato, chaveDeBusca));
+            imprimeContatoDaAgenda(contato, buscarContatoDaAgenda(contato, chaveDeBusca));
         }
 
         if(entrada == 4){
             printf("\nInsira o nome do contato para excluir:\n");
             gets(&chaveDeBusca);
 
-            contato = Excluir_contato(contato, buscaContatoDaAgenda(contato, chaveDeBusca));
+            contato = excluirContato(contato, buscarContatoDaAgenda(contato, chaveDeBusca));
         }
 
         if(entrada == 5){
@@ -226,10 +721,18 @@ int main(){
 
             salvaContatosEmArquivo = fopen("contatos.txt", "wb");
         }
+        if(entrada == 6) {
+            calendario();
+            lembretes = abrirAgendaDeLembretes(lembretes);
+            transferirLembretesParaArquivo(lembretes);
+        }
+        
     }
     printf("\nFim do programa");
 
-    transferirAgendaParaArquivo(contato);
+    transferirContatosParaArquivo(contato);
+    transferirLembretesParaArquivo(lembretes);
 
     fclose(salvaContatosEmArquivo);
+    fclose(salvaLembretesEmArquivo);
 }
