@@ -217,26 +217,30 @@ int buscarLembreteDaAgenda(EstruturaDeLembrete *lembrete, int dia, int mes, int 
         return 0;
     }
 
-    while(ponteiroDeBusca != NULL){
+    while(ponteiroDeBusca->proximoLembrete != NULL || ponteiroDeBusca == NULL){
         while( !(ponteiroDeBusca->diaEstrutura == dia && ponteiroDeBusca->mesEstrutura == mes && ponteiroDeBusca->anoEstrutura == ano) && ponteiroDeBusca != NULL){
 
             ponteiroDeBusca = ponteiroDeBusca->proximoLembrete;
             posicao++;
 
             if(ponteiroDeBusca == NULL){
-            printf("\nNao existem lembretes para o dia %d/%d/%d\n", dia, mes, ano);
-            return 0;
+                printf("\nNao existem lembretes para o dia %d/%d/%d\n", dia, mes, ano);
+                return 0;
             }
-        }
-        vetorDosLembretes[j] = posicao;
-        j++;
-        posicao++;
-        ponteiroDeBusca = ponteiroDeBusca->proximoLembrete;
-        numeroDeLembretesAchados++;
 
+        }
+        
+        if(ponteiroDeBusca != NULL){
+            vetorDosLembretes[j] = posicao;
+            j++;
+            posicao++;
+            ponteiroDeBusca = ponteiroDeBusca->proximoLembrete;
+            numeroDeLembretesAchados++;
+        }
     }
-    
+
     return numeroDeLembretesAchados;
+    
 }
 
 EstruturaDeContato * transferirContatosDoArquivoParaOPrograma(EstruturaDeContato *contatos){
@@ -559,6 +563,11 @@ EstruturaDeLembrete * abrirAgendaDeLembretes(EstruturaDeLembrete *primeiroLembre
     int dia, mes, ano;
     char lembrete[2048];
     int entradaDeSelecao = 0;
+    FILE *salvarLembretesEmArquivo;
+
+    primeiroLembrete = transferirLembretesDoArquivoParaOPrograma(primeiroLembrete);
+
+    salvarLembretesEmArquivo = fopen("lembretes.txt", "ab");
 
     while(entradaDeSelecao != 4){
     
@@ -614,17 +623,15 @@ EstruturaDeLembrete * abrirAgendaDeLembretes(EstruturaDeLembrete *primeiroLembre
                 for(i=0;i<buscarLembreteDaAgenda(primeiroLembrete, diaChave, mesChave, anoChave, vetorDasPosicoesDosLembretes);i++){
                     imprimeLembreteDaAgenda(primeiroLembrete, vetorDasPosicoesDosLembretes[i]);
                 }
-
-                for(i=0;i<3;i++){
-                    printf("%d", vetorDasPosicoesDosLembretes[i]);
-                    printf("\n");
-                }
             }
         }
+        
         else if(entradaDeSelecao == 3) {
 
         }
     }
+
+    transferirLembretesParaArquivo(primeiroLembrete);
 
     return primeiroLembrete;
 }
@@ -641,7 +648,7 @@ void abrirMenu() {
 }
 
 int main(){
-    FILE *salvaContatosEmArquivo, *salvaLembretesEmArquivo;
+    FILE *salvaContatosEmArquivo;
     EstruturaDeContato *contato = NULL;
     EstruturaDeLembrete *lembretes = NULL;
 
@@ -653,10 +660,8 @@ int main(){
     char chaveDeBusca[40];
 
     contato = transferirContatosDoArquivoParaOPrograma(contato);
-    salvaLembretesEmArquivo = transferirLembretesDoArquivoParaOPrograma(lembretes);
 
     salvaContatosEmArquivo = fopen("contatos.txt", "ab");
-    salvaLembretesEmArquivo = fopen("lembretes.txt","ab");
 
     while(entrada != 7){
         transferirContatosParaArquivo(contato);
@@ -734,5 +739,4 @@ int main(){
     transferirLembretesParaArquivo(lembretes);
 
     fclose(salvaContatosEmArquivo);
-    fclose(salvaLembretesEmArquivo);
 }
